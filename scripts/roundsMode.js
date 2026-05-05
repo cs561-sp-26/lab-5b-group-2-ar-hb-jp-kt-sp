@@ -235,11 +235,8 @@ function deleteRound(roundId) {
  * @desc
  * Present pop-up modal dialog asking user to confirm delete operation
  * @param roundId -- the unique id of the round to be deleted
- * @returns -- true if user confirms delete, false otherwise
  *************************************************************************/
 function confirmDelete(roundId) {
-  //TO DO: Present modal dialog prompting user to confirm delete
-  //Return true if user confirms delete, false otherwise
   let modal = new bootstrap.Modal(
       document.getElementById("confirmDeleteRoundModal")
   );
@@ -260,12 +257,34 @@ function confirmDelete(roundId) {
           GlobalUserData.accountInfo.email,
           JSON.stringify(GlobalUserData)
       );
-      GlobalRoundsTableCaption.textContent =
-          "Table displaying " +
-          (GlobalRoundsTable.rows.length - 1) +
-          " speedgolf rounds";
+
+      // Handle empty table case
+      const tbody = GlobalRoundsTable.querySelector("tbody");
+      if (GlobalUserData.rounds.length === 0) {
+          // Clear any remaining rows 
+          tbody.innerHTML = "";
+
+          const emptyRow = tbody.insertRow(0);
+          const cell = emptyRow.insertCell(0);
+          cell.colSpan = 9;
+          cell.textContent = "No rounds logged";
+
+          GlobalRoundsTableCaption.textContent =
+              "Table displaying 0 speedgolf rounds";
+      } else {
+          GlobalRoundsTableCaption.textContent =
+              "Table displaying " +
+              GlobalUserData.rounds.length +
+              " speedgolf rounds";
+      }
+      // Save updated data
+      localStorage.setItem(
+          GlobalUserData.accountInfo.email,
+          JSON.stringify(GlobalUserData)
+      );
+
       modal.hide();
-  });
+  }, { once: true});
   modal.show();
 }
 
