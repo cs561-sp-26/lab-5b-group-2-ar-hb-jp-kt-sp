@@ -218,6 +218,72 @@ writeRoundToTable(thisRound,rowIndex);
 }
 
 /*************************************************************************
+ * @function deleteRound
+ * @desc
+ * Deletes a round from the "Rounds" table and from local storage
+ * @param roundId -- the unique id of the round to be deleted
+ *************************************************************************/
+function deleteRound(roundNum) {
+    GlobalUserData.rounds = GlobalUserData.rounds.filter(function (round) {
+        return round.roundNum !== roundNum;
+    });
+}
+
+/*************************************************************************
+ * @function confirmDelete
+ * @desc
+ * Present pop-up modal dialog asking user to confirm delete operation
+ * @param roundId -- the unique id of the round to be deleted
+ *************************************************************************/
+function confirmDelete(roundId) {
+  let modal = new bootstrap.Modal(
+      document.getElementById("confirmDeleteRoundModal")
+  );
+  let confirmBtn = document.getElementById("confirmDeleteBtn");
+  confirmBtn.addEventListener("click", function (event) {
+      event.preventDefault();
+      console.log("deleting round with id " + roundId);
+      let row = document.getElementById("r-" + roundId);
+      if (row) {
+          row.remove();
+      }
+      deleteRound(roundId);
+      localStorage.setItem(
+          GlobalUserData.accountInfo.email,
+          JSON.stringify(GlobalUserData)
+      );
+
+      // Handle empty table case
+      const tbody = GlobalRoundsTable.querySelector("tbody");
+      if (GlobalUserData.rounds.length === 0) {
+          // Clear any remaining rows 
+          tbody.innerHTML = "";
+
+          const emptyRow = tbody.insertRow(0);
+          const cell = emptyRow.insertCell(0);
+          cell.colSpan = 9;
+          cell.textContent = "No rounds logged";
+
+          GlobalRoundsTableCaption.textContent =
+              "Table displaying 0 speedgolf rounds";
+      } else {
+          GlobalRoundsTableCaption.textContent =
+              "Table displaying " +
+              GlobalUserData.rounds.length +
+              " speedgolf rounds";
+      }
+      // Save updated data
+      localStorage.setItem(
+          GlobalUserData.accountInfo.email,
+          JSON.stringify(GlobalUserData)
+      );
+
+      modal.hide();
+  }, { once: true});
+  modal.show();
+}
+
+/*************************************************************************
 * @function populateRoundsTable 
 * @desc 
 * Iterate through the userData.rounds array, adding a row corresponding
