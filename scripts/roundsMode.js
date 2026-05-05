@@ -222,11 +222,10 @@ writeRoundToTable(thisRound,rowIndex);
  * @desc
  * Deletes a round from the "Rounds" table and from local storage
  * @param roundId -- the unique id of the round to be deleted
- * @returns -- true if round could be deleted, false otherwise
  *************************************************************************/
-function deleteRound(roundId) {
+function deleteRound(roundNum) {
     GlobalUserData.rounds = GlobalUserData.rounds.filter(function (round) {
-        return round.roundNum !== roundId;
+        return round.roundNum !== roundNum;
     });
 }
 
@@ -244,13 +243,9 @@ function confirmDelete(roundId) {
   confirmBtn.addEventListener("click", function (event) {
       event.preventDefault();
       console.log("deleting round with id " + roundId);
-      for (var i = 0; i < GlobalRoundsTable.rows.length; i++) {
-          let row = GlobalRoundsTable.rows[i];
-          // Check if the id of the row matches the id you're looking for
-          if (row.id === "r-" + roundId) {
-              GlobalRoundsTable.deleteRow(i);
-              break;
-          }
+      let row = document.getElementById("r-" + roundId);
+      if (row) {
+          row.remove();
       }
       deleteRound(roundId);
       localStorage.setItem(
